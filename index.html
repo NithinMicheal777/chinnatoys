@@ -1,0 +1,192 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Chinna Toys - India</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:Arial,sans-serif;background:#fffaf3;color:#302b35}
+header{background:#ff7043;color:white;padding:22px 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.logo{font-size:27px;font-weight:bold}
+.cart{background:white;color:#e64a19;padding:12px 18px;border-radius:25px;font-weight:bold}
+.hero{background:linear-gradient(120deg,#fff0cf,#ffe0d2);padding:40px 6%;text-align:center}
+.hero h1{font-size:clamp(28px,5vw,44px);margin:0 0 12px}
+.hero p{font-size:17px}
+.hero strong{color:#d84315}
+.controls{display:flex;justify-content:center;gap:10px;flex-wrap:wrap;padding:22px}
+input,select{padding:12px;border:1px solid #ddd;border-radius:8px;background:white;font-size:15px}
+input{width:260px;max-width:90%}
+button{border:0;padding:12px 18px;border-radius:8px;background:#e64a19;color:white;cursor:pointer;font-weight:bold}
+button:hover{background:#bf360c}
+#status{text-align:center;color:#555;padding:8px}
+.heading{text-align:center;padding:10px}
+#products{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:20px;padding:20px 5% 45px}
+.card{background:white;border:1px solid #f0e6dc;border-radius:14px;overflow:hidden;box-shadow:0 4px 14px #4b291010;display:flex;flex-direction:column}
+.card img{width:100%;height:175px;object-fit:contain;background:#fff5e9;padding:12px}
+.card-content{padding:15px;display:flex;flex-direction:column;flex:1}
+.tag{color:#e64a19;font-size:12px;font-weight:bold;text-transform:uppercase}
+.card h3{margin:9px 0}
+.desc{font-size:14px;color:#666;line-height:1.5;flex:1}
+.price{font-size:23px;font-weight:bold;color:#24834a;margin:10px 0}
+.old-price{text-decoration:line-through;color:#999;font-size:14px;font-weight:normal}
+.card button{width:100%;margin-top:8px}
+footer{background:#302b35;color:white;text-align:center;padding:25px}
+.note{font-size:12px;color:#777;text-align:center;padding:0 20px 20px}
+</style>
+</head>
+
+<body>
+<header>
+  <div class="logo">🧸 Chinna Toys</div>
+  <div>Made for little smiles 🇮🇳</div>
+  <div class="cart">🛒 Cart: <span id="cartCount">0</span></div>
+</header>
+
+<section class="hero">
+  <h1>India's Little Toy Corner 🎁</h1>
+  <p>Discover fun, learning and imagination for every child.</p>
+</section>
+
+<div class="controls">
+  <input id="search" placeholder="Search toys..." aria-label="Search toys">
+  <select id="category" aria-label="Choose toy category">
+    <option value="All">All Toys</option>
+    <option value="Toy Cars">Toy Cars</option>
+    <option value="Soft Toys">Soft Toys</option>
+    <option value="Learning Toys">Learning Toys</option>
+    <option value="Building Toys">Building Toys</option>
+    <option value="Dolls & Pretend Play">Dolls & Pretend Play</option>
+    <option value="Robots & Games">Robots & Games</option>
+  </select>
+  <select id="sort" aria-label="Sort toys">
+    <option value="default">Recommended</option>
+    <option value="low">Price: Low to High</option>
+    <option value="high">Price: High to Low</option>
+  </select>
+  <button onclick="loadApi()">Check </button>
+</div>
+
+<p id="status" role="status">Loading product API...</p>
+<h2 class="heading">🌈 Explore Our Toy Collection</h2>
+<div id="products"></div>
+<footer>
+  <h3>🧸 Chinna Toys India</h3>
+  <p>Play • Learn • Imagine</p>
+  <p>Copy rights 2026 chinna toys</p>
+</footer>
+
+<script>
+const API_URL = "https://dummyjson.com/products?limit=100";
+
+const toyData = [
+["Mini Racing Car","Toy Cars",199,"A colourful mini racing car."],
+["Monster Truck","Toy Cars",449,"Big wheels for exciting adventures."],
+["Pull Back Car","Toy Cars",149,"Pull back and watch it race."],
+["Police Toy Car","Toy Cars",249,"A pretend-play police vehicle."],
+["Toy Bus","Toy Cars",299,"A bright city bus toy."],
+["Remote Control Car","Toy Cars",899,"A fun remote control car."],
+["Classic Teddy Bear","Soft Toys",399,"A soft cuddly teddy bear."],
+["Cute Bunny Plush","Soft Toys",349,"A fluffy bunny friend."],
+["Rainbow Plush Toy","Soft Toys",299,"A colourful soft companion."],
+["Baby Elephant Plush","Soft Toys",499,"A gentle elephant plush toy."],
+["Alphabet Blocks","Learning Toys",299,"Learn letters through play."],
+["Number Learning Set","Learning Toys",199,"Discover numbers and counting."],
+["Shape Sorter","Learning Toys",349,"Learn shapes and colours."],
+["Wooden Puzzle","Learning Toys",249,"A beginner-friendly puzzle."],
+["Kids Drawing Board","Learning Toys",399,"Draw, erase and draw again."],
+["Building Blocks Set","Building Toys",499,"Build towers and little worlds."],
+["Creative Brick Kit","Building Toys",599,"Create your own designs."],
+["Stacking Rings","Building Toys",199,"Colourful stacking fun."],
+["Toy Construction Set","Building Toys",449,"Build a mini construction site."],
+["Fashion Doll","Dolls & Pretend Play",399,"A doll for imaginative stories."],
+["Doctor Play Set","Dolls & Pretend Play",349,"Pretend to be a little doctor."],
+["Toy Kitchen Set","Dolls & Pretend Play",599,"A mini kitchen for pretend play."],
+["Dancing Robot","Robots & Games",699,"A fun robot toy."],
+["Memory Matching Game","Robots & Games",249,"A game for memory and attention."]
+];
+
+const toys = toyData.map((item,i)=>({
+ id:i+1,
+ title:item[0],
+ category:item[1],
+ price:item[2],
+ description:item[3],
+ thumbnail:"https://dummyjson.com/image/400x250?text="+
+    encodeURIComponent(item[0])
+}));
+
+let cartCount = 0;
+let apiConnected = false;
+
+async function loadApi(){
+ const status = document.getElementById("status");
+ status.textContent = "Connecting to public API...";
+ try{
+   const response = await fetch(API_URL);
+   if(!response.ok) throw new Error("API request failed");
+   const data = await response.json();
+   apiConnected = true;
+   status.textContent =
+     "API connected successfully! Received " +
+     data.products.length +
+     " sample products. Showing 24 toy demo products with illustrative INR prices.";
+ }catch(error){
+   apiConnected = false;
+   status.textContent =
+     "API unavailable right now. Showing the local toy demo collection.";
+ }
+}
+
+function renderToys(){
+ const search = document.getElementById("search").value.toLowerCase();
+ const category = document.getElementById("category").value;
+ const sort = document.getElementById("sort").value;
+
+ let list = toys.filter(toy =>
+   toy.title.toLowerCase().includes(search) &&
+   (category === "All" || toy.category === category)
+ );
+
+ if(sort === "low") list.sort((a,b)=>a.price-b.price);
+ if(sort === "high") list.sort((a,b)=>b.price-a.price);
+
+ const container = document.getElementById("products");
+
+ if(list.length === 0){
+   container.innerHTML = "<p>No toys found. Try another search.</p>";
+   return;
+ }
+
+ container.innerHTML = list.map(toy=>`
+   <article class="card">
+     <img src="${toy.thumbnail}" alt="${toy.title}" loading="lazy">
+     <div class="card-content">
+       <span class="tag">${toy.category}</span>
+       <h3>${toy.title}</h3>
+       <p class="desc">${toy.description}</p>
+       <p class="price">₹${toy.price.toLocaleString("en-IN")}
+         <span class="old-price"> Demo price</span>
+       </p>
+       <button onclick="addToCart()">Add to Cart 🛒</button>
+     </div>
+   </article>
+ `).join("");
+}
+
+function addToCart(){
+ cartCount++;
+ document.getElementById("cartCount").textContent = cartCount;
+}
+
+document.getElementById("search").addEventListener("input",renderToys);
+document.getElementById("category").addEventListener("change",renderToys);
+document.getElementById("sort").addEventListener("change",renderToys);
+
+renderToys();
+loadApi();
+</script>
+</body>
+</html>
